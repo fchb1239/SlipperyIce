@@ -12,11 +12,18 @@ namespace SlipperyIce.Patches
     {
         private static void Postfix()
         {
+            //this guy really changed Level/Forest to Level/forest lmao
             if (IceHandler.instance == null)
-                GameObject.Find("Level/Forest").AddComponent<IceHandler>();
+                GameObject.Find("Level/forest").AddComponent<IceHandler>();
             else
                 Console.WriteLine("What the hell, how did this happen?");
-            GameObject.Find("Level/Forest").AddComponent<Ice>();
+            GameObject.Find("Level/forest").AddComponent<Ice>();
+
+            /*
+            GameObject.Find("Level/treeroom/tree/Tree").AddComponent<AxisInverter>();
+            foreach (Transform child in GameObject.Find("Level/Forest/SmallTrees").transform)
+                GameObject.Find(string.Format("Level/Forest/SmallTrees/{0}/SmallTree", child.gameObject.name)).AddComponent<AxisInverter>();
+            */
 
             if (Plugin.modEnabledTemp)
                 IceHandler.instance.Enable();
