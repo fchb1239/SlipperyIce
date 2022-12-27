@@ -17,8 +17,7 @@ namespace SlipperyIce.Patches
 
             try
             {
-                var pitObjects = Resources.FindObjectsOfTypeAll<GameObject>().Where(obj => obj.name.StartsWith("pit"));
-                foreach (var pitObj in pitObjects)
+                foreach (var pitObj in Resources.FindObjectsOfTypeAll<GameObject>().Where(obj => obj.name.StartsWith("pit")))
                 {
                     if (pitObj.name.EndsWith("ground"))
                     {
@@ -32,7 +31,6 @@ namespace SlipperyIce.Patches
                 Ice ice = IceObject.AddComponent<Ice>();
 
                 Plugin.Instance.iHandler = iceHandler;
-                if (Plugin.Instance.enabled) IceHandler.instance.Enable();
             }
             catch(Exception e)
             {

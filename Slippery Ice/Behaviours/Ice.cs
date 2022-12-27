@@ -1,61 +1,54 @@
-using System;
+using HarmonyLib;
 using UnityEngine;
+using GorillaLocomotion;
 
 namespace SlipperyIce.Behaviours
 {
     public class Ice : MonoBehaviour
     {
-        public static Ice instance;
         public bool isSlipping;
-        GorillaLocomotion.Player player = GorillaLocomotion.Player.Instance;
-        //MeshCollider meshCol;
-        //PhysicMaterial physicMat = Resources.Load<PhysicMaterial>("objects/forest/materials/Slippery");
-        Rigidbody rb;
-        Vector3 vel;
 
-        void Awake()
+        internal Player gPlayer = Player.Instance;
+        internal Rigidbody rBody;
+        internal Vector3 rVelocity;
+
+        internal GorillaSurfaceOverride surfaceOverride;
+        internal int defaultOverride;
+
+        internal void Start()
         {
-            instance = this;
-            //the physicmat makes it slide better along the ground... i think
-            //meshCol = transform.GetComponent<MeshCollider>();
-            rb = player.GetComponent<Rigidbody>();
+            // Physics materials work it's just that they're too realistic for this silly monke game
+            TryGetComponent(out surfaceOverride);
+            defaultOverride = surfaceOverride is null ? 0 : surfaceOverride.overrideIndex;
+            rBody = Traverse.Create(gPlayer).Field("playerRigidBody").GetValue() as Rigidbody;
         }
 
-        public void Invert(bool isX)
+        internal void Invert(bool isX)
         {
-            if (isX)
-                vel.x = vel.x - (vel.x * 2);
-            else
-                vel.z = vel.z - (vel.z * 2);
+            if (isX) rVelocity.x -= (rVelocity.x * 2);
+            else rVelocity.z -= (rVelocity.z * 2);
         }
 
-        void OnCollisionEnter(Collision col)
+        internal void OnCollisionEnter(Collision collider)
         {
-            //if (IceHandler.instance.modEnabled && IceHandler.instance.isModded && player.transform.position.y <= 5.5f)
-            if (IceHandler.instance.modEnabled && IceHandler.instance.isModded)
-            {
-                isSlipping = true;
-                //Console.WriteLine("Starting to slip");
-                //player.defaultSlideFactor = 1f;
-                //HarmonyLib.Traverse.Create(player).Field("slipPercentage").SetValue(1f);
-                //meshCol.material = physicMat;
-                vel = rb.velocity;
-                vel.y = 0;
-            }
+            if (!(collider.gameObject.name is "GorillaPlayer")) return;
+            if (!(Plugin.Instance.iHandler.isModded && Plugin.Instance.enabled)) return;
+
+            isSlipping = true;
+            rVelocity = rBody.velocity;
+            rVelocity.y = 0;
         }
 
-        void OnCollisionExit(Collision col)
+        internal void OnCollisionExit(Collision collider)
         {
+            if (!(collider.gameObject.name is "GorillaPlayer")) return;
             isSlipping = false;
-            //Console.WriteLine("No longer slipping");
-            //player.defaultSlideFactor = 0.03f;
-            //meshCol.material = new PhysicMaterial();
         }
 
-        void Update()
+        internal void FixedUpdate()
         {
-            if (isSlipping)
-                rb.velocity = vel;
+            if (isSlipping && !(rBody is null)) rBody.velocity = rVelocity;
+            if (!(surfaceOverride is null)) surfaceOverride.overrideIndex = (Plugin.Instance.iHandler.isModded && Plugin.Instance.enabled) ? 59 : defaultOverride;
         }
     }
 }

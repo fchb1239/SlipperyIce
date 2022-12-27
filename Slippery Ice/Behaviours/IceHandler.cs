@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -13,23 +11,20 @@ namespace SlipperyIce.Behaviours
         internal Texture iceTex;
         internal Texture defaultTex;
 
-        void Awake()
+        internal void Awake()
         {
             defaultTex = GetComponent<Renderer>().material.mainTexture;
-            StartCoroutine(LoadImage());
+            StartCoroutine(routine: LoadImage());
         }
 
-        public void Enable()
-        {
-            if (isModded) SetGroundTexture(true);
-        }
+        public void Enable() => SetGroundTexture(true);
 
         public void Disable() => SetGroundTexture(false);
 
         public void JoinedModded()
         {
             isModded = true;
-            if (modEnabled) SetGroundTexture(true);
+            SetGroundTexture(true);
         }
 
         public void LeftModded()
@@ -38,39 +33,32 @@ namespace SlipperyIce.Behaviours
             SetGroundTexture(false);
         }
 
-        void SetGroundTexture(bool isIce)
+        internal void SetGroundTexture(bool isIce)
         {
-            if (mat && !(enabled && isModded)) return;
-
-            if (mat)
-            {
-                Material[] materials = transform.gameObject.GetComponent<MeshRenderer>().materials;
-                materials[0] = ice;
-                transform.gameObject.GetComponent<MeshRenderer>().materials = materials;
-                return;
-            }
-
-            Material[] materials = transform.gameObject.GetComponent<MeshRenderer>().materials;
-            materials[0] = ground;
-            transform.gameObject.GetComponent<MeshRenderer>().materials = materials;
+            // if (isIce && !(Plugin.Instance.enabled && isModded)) return;
+            GetComponent<Renderer>().material.mainTexture = isIce ? iceTex as Texture2D : defaultTex as Texture2D;
         }
 
-        private IEnumerator LoadImage()
+        internal IEnumerator LoadImage()
         {
             var imageGet = GetImageRequest();
             yield return imageGet.SendWebRequest();
 
-            Texture2D tex = new Texture2D(2048, 2048, TextureFormat.RGB24, false);
-            tex.filterMode = FilterMode.Point;
+            Texture2D tex = new Texture2D(defaultTex.width, defaultTex.height, TextureFormat.RGBA32, false);
             tex.LoadImage(imageGet.downloadHandler.data);
+            tex.Apply();
+
+            tex.filterMode = defaultTex.filterMode;
+            tex.name = "iceground";
+
+            iceTex = tex;
         }
 
-        private UnityEngine.Networking.UnityWebRequest GetImageRequest()
+        internal UnityWebRequest GetImageRequest()
         {
-            var request = new UnityEngine.Networking.UnityWebRequest($"https://raw.githubusercontent.com/fchb1239/SlipperyIce/main/forestatlasButIcy.png", "GET");
-            request.downloadHandler = new DownloadHandlerBuffer();
-
-            return request;
+            var uImageRequest = new UnityWebRequest("https://raw.githubusercontent.com/developer9998/SlipperyIce/main/iceground.png", "GET");
+            uImageRequest.downloadHandler = new DownloadHandlerBuffer();
+            return uImageRequest;
         }
     }
 }
