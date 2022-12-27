@@ -1,6 +1,4 @@
-using HarmonyLib;
 using UnityEngine;
-using GorillaLocomotion;
 
 namespace SlipperyIce.Behaviours
 {
@@ -17,7 +15,6 @@ namespace SlipperyIce.Behaviours
 
         internal void Start()
         {
-            // Physics materials work it's just that they're too realistic for this silly monke game
             TryGetComponent(out surfaceOverride);
             TryGetComponent(out collider);
             defaultOverride = surfaceOverride is null ? 0 : surfaceOverride.overrideIndex;
