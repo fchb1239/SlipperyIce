@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using System;
 using System.Reflection;
+using System.ComponentModel;
 using Utilla;
 using HarmonyLib;
 using SlipperyIce.Behaviours;
@@ -8,6 +9,7 @@ using SlipperyIce.Behaviours;
 namespace SlipperyIce
 {
     [ModdedGamemode]
+    [Description("HauntedModMenu")]
     [BepInDependency("org.legoandmars.gorillatag.utilla", "1.5.0")]
     [BepInPlugin(PluginInfo.GUID, PluginInfo.Name, PluginInfo.Version)]
     public class Plugin : BaseUnityPlugin

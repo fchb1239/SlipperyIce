@@ -35,7 +35,7 @@ namespace SlipperyIce.Behaviours
 
         internal void SetGroundTexture(bool isIce)
         {
-            // if (isIce && !(Plugin.Instance.enabled && isModded)) return;
+            if (isIce && !(Plugin.Instance.enabled && isModded)) return;
             GetComponent<Renderer>().material.mainTexture = isIce ? iceTex as Texture2D : defaultTex as Texture2D;
         }
 
